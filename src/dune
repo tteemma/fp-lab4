@@ -1,0 +1,5 @@
+(library
+ (name fp_search)
+ (public_name fp_search)
+ (libraries unix)
+ (modules util tokenizer doc index query engine store))

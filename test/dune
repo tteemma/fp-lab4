@@ -1,0 +1,4 @@
+(test
+ (name test_fp_search)
+ (modules test_fp_search)
+ (libraries fp_search alcotest))

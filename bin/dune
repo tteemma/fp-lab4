@@ -1,0 +1,5 @@
+(executable
+ (name fp_search_cli)
+ (public_name fp-search)
+ (modules fp_search_cli)
+ (libraries fp_search unix))

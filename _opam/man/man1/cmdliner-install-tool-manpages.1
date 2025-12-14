@@ -1,0 +1,61 @@
+.\" Pipe this output to groff -m man -K utf8 -T utf8 | less -R
+.\"
+.mso an.tmac
+.TH "CMDLINER-INSTALL-TOOL-MANPAGES" 1 "" "Cmdliner v2.0.0" "Cmdliner Manual"
+.\" Disable hyphenation and ragged-right
+.nh
+.ad l
+.SH NAME
+.P
+cmdliner\N'45'install\N'45'tool\N'45'manpages \N'45' Install tool and subcommand manpages
+.SH SYNOPSIS
+.P
+\fBcmdliner install tool\N'45'manpages\fR [\fB\N'45'\N'45'dry\N'45'run\fR] [\fB\N'45'\N'45'update\N'45'opam\N'45'install\fR=\fIPKG\N'46'install\fR] [\fIOPTION\fR]… \fITOOLEXEC[:NAME]\fR… \fIMANDIR\fR
+.SH DESCRIPTION
+.P
+\fBcmdliner install tool\N'45'manpages\fR installs the manpages of the tool and its commands according in directories of a \fBman\fR directory\N'46' Directories are created if needed\N'46' Use option \fB\N'45'\N'45'dry\N'45'run\fR to see which paths would be written\N'46' Example:
+.P
+.nf
+\fBcmdliner install tool\N'45'manpages\fR \fB\N'46'/mytool\fR \fB/usr/local/share/man\fR
+.fi
+.P
+Note that the command \fBinstall tool\N'45'support\fR also installs manpages like this command does\N'46'
+.SH ARGUMENTS
+.TP 4
+\fIMANDIR\fR (required)
+\fIMANDIR\fR is the root \fBman\fR directory to install to\N'46'
+.TP 4
+\fITOOLEXEC[:NAME]\fR (required)
+\fITOOLEXEC\fR is the tool executable\N'46' Searched in the \fBPATH\fR unless an explicit file path is specified\N'46' \fINAME\fR is the tool name, if unspecified derived from \fITOOLEXEC\fR by taking the basename and stripping any \fB\N'46'exe\fR extension\N'46' Repeatable\N'46'
+.SH OPTIONS
+.TP 4
+\fB\N'45'\N'45'dry\N'45'run\fR
+Do not install, output paths that would be written\N'46'
+.TP 4
+\fB\N'45'\N'45'update\N'45'opam\N'45'install\fR=\fIPKG\N'46'install\fR
+Update or create an opam \fB\N'46'install\fR file \fIPKG\N'46'install\fR with install moves from the installed files to the corresponding opam install sections\N'46' Also performed if \fB\N'45'\N'45'dry\N'45'run\fR is specified\N'46'
+.SH COMMON OPTIONS
+.TP 4
+\fB\N'45'\N'45'help\fR[=\fIFMT\fR] (default=\fBauto\fR)
+Show this help in format \fIFMT\fR\N'46' The value \fIFMT\fR must be one of \fBauto\fR, \fBpager\fR, \fBgroff\fR or \fBplain\fR\N'46' With \fBauto\fR, the format is \fBpager\fR or \fBplain\fR whenever the \fBTERM\fR env var is \fBdumb\fR or undefined\N'46'
+.TP 4
+\fB\N'45'\N'45'version\fR
+Show version information\N'46'
+.SH EXIT STATUS
+.P
+\fBcmdliner install tool\N'45'manpages\fR exits with:
+.TP 4
+0
+on success\N'46'
+.TP 4
+123
+on indiscriminate errors reported on standard error\N'46'
+.TP 4
+124
+on command line parsing errors\N'46'
+.TP 4
+125
+on unexpected internal errors (bugs)\N'46'
+.SH SEE ALSO
+.P
+cmdliner(1)

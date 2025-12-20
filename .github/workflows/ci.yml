@@ -12,23 +12,29 @@ jobs:
 
     container:
       image: ocaml/opam:ubuntu-22.04-ocaml-5.1
+      options: --user 0
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # GitHub иногда ругается на "dubious ownership" внутри контейнера
-      - name: Mark workspace as safe
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Fix permissions
+        run: |
+          chown -R opam:opam "$GITHUB_WORKSPACE"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-      - name: Update opam repository
-        run: opam update -y
+      - name: Update opam repo
+        run: |
+          su - opam -c "opam update -y"
 
-      - name: Install dependencies (including test deps)
-        run: opam install . --deps-only --with-test -y
+      - name: Install deps
+        run: |
+          su - opam -c "opam install . --deps-only --with-test -y"
 
       - name: Build
-        run: opam exec -- dune build
+        run: |
+          su - opam -c "opam exec -- dune build"
 
       - name: Test
-        run: opam exec -- dune runtest
+        run: |
+          su - opam -c "opam exec -- dune runtest"

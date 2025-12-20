@@ -6,7 +6,6 @@ let test_tokenizer_basic () =
   check (list string) "tokens" [ "hello"; "world"; "hello_world"; "123" ] toks
 
 let test_query_parse_precedence () =
-  (* NOT > AND > OR *)
   let q = "a OR b AND NOT c" in
   match Query.parse q with
   | Error e -> fail e

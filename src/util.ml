@@ -40,11 +40,9 @@ let safe_read_file ~max_bytes path =
     (fun () ->
       let len =
         try in_channel_length ic with _ ->
-          (* Some virtual filesystems may not support it. *)
           max_bytes + 1
       in
       if len > max_bytes then Error (`Too_large len)
       else
         let data = really_input_string ic len in
-        (* Quick binary check: NUL in first chunk. *)
         if String.contains data '\000' then Error `Binary else Ok data)

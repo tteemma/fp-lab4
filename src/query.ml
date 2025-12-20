@@ -35,9 +35,7 @@ let tokenize (s : string) : token list =
       else Term w :: acc
   in
 
-  (* rec тут НЕ нужен *)
   let read_phrase i acc =
-    (* текущий символ s.[i] = '"' *)
     let i = i + 1 in
     let start = i in
     let rec find_end j =

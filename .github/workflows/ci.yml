@@ -27,14 +27,14 @@ jobs:
         run: |
           su - opam -c "opam update -y"
 
-      - name: Install deps
+      - name: Install deps (incl dune + test deps)
         run: |
-          su - opam -c "opam install . --deps-only --with-test -y"
+          su - opam -c "cd '$GITHUB_WORKSPACE' && opam install . --deps-only --with-test -y"
 
       - name: Build
         run: |
-          su - opam -c "opam exec -- dune build"
+          su - opam -c "cd '$GITHUB_WORKSPACE' && opam exec -- dune build"
 
       - name: Test
         run: |
-          su - opam -c "opam exec -- dune runtest"
+          su - opam -c "cd '$GITHUB_WORKSPACE' && opam exec -- dune runtest"

@@ -8,7 +8,7 @@ type posting = {
 
 type t = {
   docs : Doc.t IntMap.t;
-  inv : posting IntMap.t StrMap.t; (* term -> (doc_id -> posting) *)
+  inv : posting IntMap.t StrMap.t; 
   next_doc_id : int;
 }
 

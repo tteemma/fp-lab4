@@ -2,32 +2,32 @@ name: OCaml CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
   pull_request:
-    branches: ["main"]
+    branches: ['main']
 
 jobs:
-  build:
+  build_and_test:
     runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Set up OCaml
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up OCaml (opam)
         uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: "5.1.0"
+          ocaml-compiler: '5.1.0'
+          opam-cache: true
 
-      - name: Install deps
+      - name: Install dependencies
         run: |
-          opam install . --deps-only -y
-          eval $(opam env)
+          opam install . --deps-only --with-test -y
 
       - name: Build
         run: |
-          eval $(opam env)
-          dune build
+          opam exec -- dune build
 
       - name: Test
         run: |
-          eval $(opam env)
-          dune test
+          opam exec -- dune test

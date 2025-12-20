@@ -17,14 +17,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # В контейнерах git иногда ругается на "dubious ownership"
+      # GitHub иногда ругается на "dubious ownership" внутри контейнера
       - name: Mark workspace as safe
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-      - name: Update opam repo
-        run: opam update
+      - name: Update opam repository
+        run: opam update -y
 
-      - name: Install deps
+      - name: Install dependencies (including test deps)
         run: opam install . --deps-only --with-test -y
 
       - name: Build

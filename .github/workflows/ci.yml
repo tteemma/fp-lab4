@@ -7,27 +7,25 @@ on:
     branches: ['main']
 
 jobs:
-  build_and_test:
+  build:
     runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up OCaml (opam)
+      - name: Set up OCaml
         uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: '5.1.0'
-          opam-cache: true
+          dune-cache: true
+          opam-disable-sandboxing: true
 
-      - name: Install dependencies
-        run: |
-          opam install . --deps-only --with-test -y
+      - name: Install deps
+        run: opam install . --deps-only --with-test -y
 
       - name: Build
-        run: |
-          opam exec -- dune build
+        run: opam exec -- dune build
 
       - name: Test
-        run: |
-          opam exec -- dune test
+        run: opam exec -- dune test

@@ -6,26 +6,55 @@ on:
   pull_request:
     branches: ['main']
 
+permissions: read-all
+
 jobs:
-  build:
+  build_and_test:
     runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # ВАЖНО: системные пакеты ДО setup-ocaml
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential m4 pkg-config git curl
+
       - name: Set up OCaml
+        id: setup
         uses: ocaml/setup-ocaml@v3
+        continue-on-error: true
         with:
-          ocaml-compiler: '5.1.0'
-          dune-cache: true
+          ocaml-compiler: '5'
           opam-disable-sandboxing: true
+          dune-cache: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Если setup упал — всё равно покажем логи, чтобы понять причину
+      - name: Dump opam logs (always)
+        if: always()
+        run: |
+          echo "=== opam version ==="
+          opam --version || true
+          echo "=== ~/.opam/log (last 200 lines) ==="
+          ls -la ~/.opam/log || true
+          tail -n 200 ~/.opam/log/*.err ~/.opam/log/*.out 2>/dev/null || true
+
+      # Здесь явно завершаем job ошибкой, если setup не поднялся
+      - name: Fail if OCaml setup failed
+        if: steps.setup.outcome != 'success'
+        run: exit 1
 
       - name: Install deps
-        run: opam install . --deps-only --with-test -y
+        run: |
+          opam install . --deps-only --with-test -y
 
       - name: Build
-        run: opam exec -- dune build
+        run: |
+          opam exec -- dune build
 
       - name: Test
-        run: opam exec -- dune test
+        run: |
+          opam exec -- dune runtest

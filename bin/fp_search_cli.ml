@@ -58,11 +58,15 @@ let load_index_or_exit path =
       Printf.eprintf "Load error: %s\n%!" e;
       exit 2
 
-let run_stats argv =
+let with_index argv f =
   let path = get_opt argv "--index" ~default:"./index.bin" in
   let idx = load_index_or_exit path in
-  Printf.printf "Index: %s\nDocs: %d\nTerms: %d\n%!" path
-    (Index.doc_count idx) (Index.term_count idx)
+  f ~path idx
+
+let run_stats argv =
+  with_index argv (fun ~path idx ->
+      Printf.printf "Index: %s\nDocs: %d\nTerms: %d\n%!" path
+        (Index.doc_count idx) (Index.term_count idx))
 
 let run_search argv =
   let path = get_opt argv "--index" ~default:"./index.bin" in
@@ -87,41 +91,40 @@ let run_search argv =
           hits
 
 let run_repl argv =
-  let path = get_opt argv "--index" ~default:"./index.bin" in
-  let idx = load_index_or_exit path in
-  Printf.printf "fp-search REPL. Type :quit to exit.\nType :help for help.\n%!";
-  let rec loop () =
-    Printf.printf "> %!";
-    match read_line () with
-    | exception End_of_file -> ()
-    | line ->
-        let line = String.trim line in
-        if line = "" then loop ()
-        else if line = ":quit" || line = ":q" || line = "quit" then ()
-        else if line = ":help" then (
-          Printf.printf
-            "Query syntax: AND/OR/NOT, parentheses, and phrases in quotes.\n\
-             Examples:\n\
-             - foo bar\n\
-             - (foo OR bar) AND baz\n\
-             - NOT deprecated AND \"hello world\"\n%!";
-          loop ())
-        else (
-          match Query.parse line with
-          | Error e ->
-              Printf.printf "Parse error: %s\n%!" e;
-              loop ()
-          | Ok q ->
-              let hits = Engine.search idx ~q ~top:10 ~with_snippets:true in
-              if hits = [] then Printf.printf "(no results)\n%!"
-              else
-                List.iteri
-                  (fun i h ->
-                    Printf.printf "%2d) %s\n%!" (i + 1) (Engine.pp_hit h))
-                  hits;
+  with_index argv (fun ~path:_ idx ->
+      Printf.printf "fp-search REPL. Type :quit to exit.\nType :help for help.\n%!";
+      let rec loop () =
+        Printf.printf "> %!";
+        match read_line () with
+        | exception End_of_file -> ()
+        | line ->
+            let line = String.trim line in
+            if line = "" then loop ()
+            else if line = ":quit" || line = ":q" || line = "quit" then ()
+            else if line = ":help" then (
+              Printf.printf
+                "Query syntax: AND/OR/NOT, parentheses, and phrases in quotes.\n\
+                 Examples:\n\
+                 - foo bar\n\
+                 - (foo OR bar) AND baz\n\
+                 - NOT deprecated AND \"hello world\"\n%!";
               loop ())
-  in
-  loop ()
+            else (
+              match Query.parse line with
+              | Error e ->
+                  Printf.printf "Parse error: %s\n%!" e;
+                  loop ()
+              | Ok q ->
+                  let hits = Engine.search idx ~q ~top:10 ~with_snippets:true in
+                  if hits = [] then Printf.printf "(no results)\n%!"
+                  else
+                    List.iteri
+                      (fun i h ->
+                        Printf.printf "%2d) %s\n%!" (i + 1) (Engine.pp_hit h))
+                      hits;
+                  loop ())
+      in
+      loop ())
 
 let () =
   if Array.length Sys.argv < 2 then (
